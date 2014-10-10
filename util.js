@@ -306,7 +306,7 @@
     };
     // Ajax相关
     util.ajax = {
-        createXHR : function() {
+        createXHR             : function() {
             if ( typeof XMLHttpRequest != 'undefined' ) {
                 return new XMLHttpRequest();
             } else if ( typeof ActiveXObject != 'undefined' ) {
@@ -322,19 +322,45 @@
                 }
                 return xhr;
             } else {
-                throw new Error('no XHR object available.');
+                throw new Error( 'no XHR object available.' );
             }
         },
-        createCORSRequest : function(method, url) {
+        createCORSRequest     : function( method, url ) {
             var xhr = new XMLHttpRequest();
-            if ('withCredentials' in xhr) {
-                xhr.open(method, url, true);
-            } else if (typeof XDomainRequest != 'undefined') {
+            if ( 'withCredentials' in xhr ) {
+                xhr.open( method, url, true );
+            } else if ( typeof XDomainRequest != 'undefined' ) {
                 xhr = new XDomainRequest();
-                xhr.open(method, url);
+                xhr.open( method, url );
             } else {
                 xhr = null;
             }
+            return xhr;
+        },
+        imagePing             : function( url, onLoad, onError ) {
+            var img = new Image();
+            if ( onLoad && (typeof onLoad == 'function') ) {
+                img.onload = onLoad;
+            }
+            if ( onError && (typeof onError == 'function') ) {
+                img.onerror = onError;
+            }
+            img.src = url;
+        },
+        createStreamingClient : function( url, progress, finished ) {
+            var xhr = new XMLHttpRequest(), recevied = 0;
+            xhr.open( 'get', url, true );
+            xhr.onreadystatechange = function() {
+                var result;
+                if ( xhr.readyState == 3 ) {
+                    result = xhr.responseText.substring( recevied );
+                    recevied = result.length;
+                    progress( result );
+                } else if ( xhr.readyState == 4 ) {
+                    finished( xhr.responseText );
+                }
+            };
+            xhr.send( null );
             return xhr;
         }
     };
