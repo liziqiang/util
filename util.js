@@ -304,6 +304,40 @@
             }
         }
     };
+    // Ajax相关
+    util.ajax = {
+        createXHR : function() {
+            if ( typeof XMLHttpRequest != 'undefined' ) {
+                return new XMLHttpRequest();
+            } else if ( typeof ActiveXObject != 'undefined' ) {
+                if ( typeof arguments.callee.activeXString != 'string' ) {
+                    var versions = [ 'MSXML2.XMLHttp.6.0', 'MSXML2.XMLHttp.3.0', 'MSXML2.XMLHttp' ], i = 0, len = versions.length, xhr = null;
+                    for ( ; i < len; i++ ) {
+                        try {
+                            xhr = new ActiveXObject( versions[ i ] );
+                            arguments.callee.activeXString = versions[ i ];
+                            break;
+                        } catch ( err ) {}
+                    }
+                }
+                return xhr;
+            } else {
+                throw new Error('no XHR object available.');
+            }
+        },
+        createCORSRequest : function(method, url) {
+            var xhr = new XMLHttpRequest();
+            if ('withCredentials' in xhr) {
+                xhr.open(method, url, true);
+            } else if (typeof XDomainRequest != 'undefined') {
+                xhr = new XDomainRequest();
+                xhr.open(method, url);
+            } else {
+                xhr = null;
+            }
+            return xhr;
+        }
+    };
     window.util = util;
 })();
 //var obj = {};
