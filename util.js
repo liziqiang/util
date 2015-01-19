@@ -638,6 +638,22 @@
             return xhr;
         }
     };
+    util.namespace = function( root, path, value ) {
+        if ( !path ) { return root; }
+        var ary = path.split( '.' ), k = '';
+        while ( k = ary.shift() ) {
+            if ( k ) {
+                if ( typeof root[ k ] == 'undefined' ) {
+                    root[ k ] = ary.length ? {} : value;
+                } else {
+                    if ( !ary.length ) {
+                        throw new Error( '#############当前命名空间' + k + '已被占用鸟~#############' )
+                    }
+                }
+                root = root[ k ];
+            }
+        }
+    };
     window.util = util;
 })();
 //var obj = {};
