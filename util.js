@@ -1,7 +1,41 @@
 (function( win ) {
-    var util = {};
+    var __ = {};
+    // 字符串相关处理
+    __.string = {};
+    (function() {
+        /**
+         * 对字符串进行异或操作
+         * @param s1
+         * @param s2
+         */
+        function stringxor( s1, s2 ) {
+            var s = '', hash = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', max = Math.max( s1.length, s2.length );
+            for ( var i = 0; i < max; i++ ) {
+                var k = s1.charCodeAt( i ) ^ s2.charCodeAt( i );
+                s += hash.charAt( k % 52 );
+            }
+        }
+
+        /**
+         * 对字符串进行哈希计算
+         * @param str 目标字符串
+         * @param len 哈希字符串长度，默认32
+         * @returns {string} 哈希后的字符串
+         */
+        __.string.hash = function( str, len ) {
+            len = len || 32;
+            var start = 0, result = '';
+            // 使用0补齐字符串为hash字符串的倍数
+            str += new Array( len - str.length % len + 1 ).join( '0' );
+            while ( start < str.length ) {
+                result = stringxor( result, str.substr( start, len ) );
+                start += len;
+            }
+            return result;
+        };
+    })();
     // url解析相关
-    util.url = {
+    __.url = {
         getParam : function( name ) {
             var r = new RegExp( '[?&]' + name + '=([^&]*)' ), s = window.location.href, ret = null;
             if ( r.test( s ) ) {
@@ -14,7 +48,7 @@
         }
     };
     // 模板方法
-    util.tmpl = function( data, tpl, des ) {
+    __.tmpl = function( data, tpl, des ) {
         var $tpl = document.getElementById( tpl ), val = $tpl && $tpl.innerHTML || '';
         if ( !val ) { return; }
         var r = /<!--([\s\S]+)-->/, ary = [], strTpl = null, html = null, o = null;
@@ -35,11 +69,11 @@
         }
         return html;
     };
-    util.replaceAll = function( input, find, replace ) {
+    __.replaceAll = function( input, find, replace ) {
         return input.replace( RegExp( find.replace( /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&" ), 'g' ), replace );
     };
     // 版本号比较
-    util.compareVersion = function( vera, verb ) {
+    __.compareVersion = function( vera, verb ) {
         var ret = 0, va, vb;
         var veraAry = vera.split( '.' ), verbAry = verb.split( '.' ), maxLen = Math.max( veraAry.length, verbAry.length );
         for ( var i = 0; i < maxLen && !ret; i++ ) {
@@ -55,16 +89,16 @@
         return ret;
     };
     // 获得[lower, upper]范围内的整数
-    util.random = function( lower, upper ) {
+    __.random = function( lower, upper ) {
         var range = upper - lower + 1;
         return Math.floor( Math.random() * range + lower );
     };
     // 属性是否来自原型
-    util.fromPrototype = function( obj, name ) {
+    __.fromPrototype = function( obj, name ) {
         return !obj.hasOwnProperty( name ) && (name in obj);
     };
     // 日起相关
-    util.date = {
+    __.date = {
         format : function( date, format ) {
             if ( !date ) { return; }
             var map = {
@@ -98,7 +132,7 @@
     // 检测是否支持CSS3属性
     // http://note.rpsh.net/posts/2011/05/20/css
     // http://ecd.tencent.com/css3/guide.html
-    util.supportCss3 = function( style ) {
+    __.supportCss3 = function( style ) {
         var prefix = [ 'webkit', 'Moz', 'ms', 'o' ], htmlStyle = document.documentElement.style, aryHump = [], i;
         // 转换成驼峰写法
         function _toHump( str ) {
@@ -119,7 +153,7 @@
         return false;
     };
     // 截字处理
-    util.ellipsis = function( ele ) {
+    __.ellipsis = function( ele ) {
         var limitWidth = ele.clientWidth, ellipsisText = '...';
         var tmp = ele.cloneNode( true );
         ele.parentNode.appendChild( tmp );
@@ -145,7 +179,7 @@
         tmp.parentNode.removeChild( tmp );
     };
     // 获取浏览器滚动条宽高
-    util.detectScrollbarWidthHeight = function() {
+    __.detectScrollbarWidthHeight = function() {
         var $div = document.createElement( 'div' );
         $div.id = '__detect__';
         $div.style.overflow = 'scroll';
@@ -162,26 +196,26 @@
         return hw;
     };
     // 获取页面滚动高度
-    util.getScrollTop = function() {
+    __.getScrollTop = function() {
         // 如果以声明DTD，则使用documentElement，但是Chrome是例外
         var doc = document, client = doc.compatMode == 'CSS1Compat' ? doc.documentElement : doc.body;
         return client.scrollTop;
     };
     // 获取页面可视高度，不包含滚动条
-    util.getClientHeight = function() {
+    __.getClientHeight = function() {
         // 如果以声明DTD，则使用documentElement，但是Chrome是例外
         var doc = document, client = doc.compatMode == 'CSS1Compat' ? doc.documentElement : doc.body;
         return client.clientHeight;
     };
     // 获取页面总体高估
-    util.getScrollHeight = function() {
+    __.getScrollHeight = function() {
         // 如果以声明DTD，则使用documentElement，但是Chrome是例外
         var doc = document, client = doc.compatMode == 'CSS1Compat' ? doc.documentElement : doc.body;
         return Math.max( client.scrollHeight, client.clientHeight );
     };
     // 检测节点是否包含另一节点
-    util.contains = function( pNode, cNode ) {
-        if ( typeof pNode.contains == 'function' && (!util.browser.engine.webkit || util.browser.engine.webkit >= 522) ) {
+    __.contains = function( pNode, cNode ) {
+        if ( typeof pNode.contains == 'function' && (!__.browser.engine.webkit || __.browser.engine.webkit >= 522) ) {
             return pNode.contains( cNode );
         } else if ( typeof pNode.compareDocumentPosition == 'function' ) {
             return !!(pNode.compareDocumentPosition( cNode ) & 16);
@@ -198,7 +232,7 @@
         }
     };
     // 浏览器相关
-    util.browser = function() {
+    __.browser = function() {
         // 呈现引擎
         var engine = {
             ie     : 0,
@@ -354,7 +388,7 @@
         };
     }();
     // 加载CSS
-    util.loadStyles = function( url ) {
+    __.loadStyles = function( url ) {
         var link = document.createElement( 'link' );
         link.rel = 'stylesheet';
         link.type = 'text/css';
@@ -362,7 +396,7 @@
         var head = document.getElementsByTagName( 'head' )[ 0 ];
         head.appendChild( link );
     };
-    util.loadScriptString = function( code ) {
+    __.loadScriptString = function( code ) {
         var script = document.createElement( 'script' );
         script.type = 'text/javascript';
         try {
@@ -372,7 +406,7 @@
         }
         document.body.appendChild( script );
     };
-    util.loadStyleString = function( css ) {
+    __.loadStyleString = function( css ) {
         var style = document.createElement( 'style' );
         style.type = 'text/css';
         try {
@@ -384,7 +418,7 @@
         head.appendChild( style );
     };
     // 获取选中的文本
-    util.getSelectedText = function( textbox ) {
+    __.getSelectedText = function( textbox ) {
         if ( typeof textbox.selectionStart == 'number' ) {
             return textbox.value.substring( textbox.selectionStart, textbox.selectionEnd );
         } else if ( document.selection ) {
@@ -392,7 +426,7 @@
         }
     };
     // 设置文本选中
-    util.selectText = function( textbox, start, end ) {
+    __.selectText = function( textbox, start, end ) {
         if ( textbox.setSelectionRange ) {
             textbox.setSelectionRange( start, end );
         } else if ( textbox.createTextRange ) {
@@ -405,7 +439,7 @@
         textbox.focus();
     };
     // cookie方法
-    util.cookie = {
+    __.cookie = {
         get   : function( name ) {
             var cookieName = encodeURIComponent( name ), cookieStart = document.cookie.indexOf( cookieName ), cookieValue = null;
             if ( cookieStart > -1 ) {
@@ -489,9 +523,9 @@
         return storage;
     }
 
-    util.localStorage = new _storage();
+    __.localStorage = new _storage();
     // 事件相关方法
-    util.event = {
+    __.event = {
         add              : function( ele, type, handler ) {
             if ( ele.addEventListener ) {
                 ele.addEventListener( type, handler, false );
@@ -579,7 +613,7 @@
         }
     };
     // Ajax相关
-    util.ajax = {
+    __.ajax = {
         createXHR             : function() {
             if ( typeof XMLHttpRequest != 'undefined' ) {
                 return new XMLHttpRequest();
@@ -638,7 +672,7 @@
             return xhr;
         }
     };
-    util.namespace = function( root, path, value ) {
+    __.namespace = function( root, path, value ) {
         if ( !path ) { return root; }
         var ary = path.split( '.' ), k = '';
         while ( k = ary.shift() ) {
@@ -654,7 +688,7 @@
             }
         }
     };
-    window.util = util;
+    window.__ = window.__ || __;
 })();
 //var obj = {};
 //Object.defineProperty( obj, 'name', { writable : false, value : "John" } );
