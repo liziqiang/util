@@ -97,9 +97,16 @@
     __.fromPrototype = function( obj, name ) {
         return !obj.hasOwnProperty( name ) && (name in obj);
     };
+    // 数字相关
+    __.number = {
+        pad : function( source, length ) {
+            var string = '' + Math.abs( +source );
+            return (source < 0 ? '-' : '') + (new Array( length + 1 ).join( '0' ) + string).substr( string.length );
+        }
+    };
     // 日起相关
     __.date = {
-        format : function( date, format ) {
+        format : function( date, pattern ) {
             if ( !date ) { return; }
             var map = {
                 'M+' : date.getMonth() + 1,
@@ -113,20 +120,20 @@
             };
             var week = [ '周日', '周一', '周二', '周三', '周四', '周五', '周六' ];
             // 年
-            if ( /(y+)/.test( format ) ) {
-                format = format.replace( RegExp.$1, (date.getFullYear() + '').substr( 4 - RegExp.$1.length ) );
+            if ( /(y+)/.test( pattern ) ) {
+                pattern = pattern.replace( RegExp.$1, (date.getFullYear() + '').substr( 4 - RegExp.$1.length ) );
             }
             // 星期
-            if ( /(w+)/.test( format ) ) {
-                format = format.replace( RegExp.$1, week[ map[ 'w+' ] ] );
+            if ( /(w+)/.test( pattern ) ) {
+                pattern = pattern.replace( RegExp.$1, week[ map[ 'w+' ] ] );
             }
             // 其它格式
             for ( var k in map ) {
-                if ( new RegExp( '(' + k + ')' ).test( format ) ) {
-                    format = format.replace( RegExp.$1, RegExp.$1.length == 1 ? map[ k ] : ('00' + map[ k ]).substr( ('' + map[ k ]).length ) );
+                if ( new RegExp( '(' + k + ')' ).test( pattern ) ) {
+                    pattern = pattern.replace( RegExp.$1, __.number.pad( map[ k ], 2 ) );
                 }
             }
-            return format;
+            return pattern;
         }
     };
     // 检测是否支持CSS3属性
