@@ -620,18 +620,19 @@
         }
     };
     // 观察者模式
-    __.pubsub = {
-        on      : function( ev, handler ) {
-            var handlers = this.__handlers || (this.__handlers = {});
-            (handlers[ ev ] || (handlers[ ev ] = [])).push( handler );
+    __.observer = {
+        on      : function( type, handler, options ) {
+            var cache = this.__cache || (this.__cache = {});
+            (cache[ type ] || (cache[ type ] = [])).push( { arg : options, fun : handler } );
             return this;
         },
-        trigger : function( ev ) {
-            var handlers = this.__handlers || (this.__handlers = {});
-            var handler = handlers[ ev ];
-            if ( handler ) {
-                for ( var i = 0, len = handler.length; i < len; i++ ) {
-                    handler[ i ].apply( this, Array.prototype.slice.call( arguments, 1 ) );
+        trigger : function( type, options ) {
+            var cache = this.__cache || (this.__cache = {});
+            var handlers = cache[ type ], len = handlers && handlers.length, handler = null;
+            if ( len ) {
+                for ( var i = 0; i < len; i++ ) {
+                    handler = handlers[ i ];
+                    handler.fun.apply( this, [ type, options, handler.arg ] );
                 }
             }
             return this;
