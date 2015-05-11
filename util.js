@@ -628,13 +628,33 @@
         },
         trigger : function( type, options ) {
             var cache = this.__cache || (this.__cache = {});
-            var handlers = cache[ type ], len = handlers && handlers.length, handler = null;
+            var handlers = cache[ type ] || [], len = handlers.length, handler = null;
             if ( len ) {
                 for ( var i = 0; i < len; i++ ) {
                     handler = handlers[ i ];
                     handler.fun.apply( this, [ type, options, handler.arg ] );
                 }
             }
+            return this;
+        },
+        off     : function( type, handler ) {
+            var cache = this.__cache || (this.__cache = {});
+            var handlers = cache[ type ] || [], callback = null;
+            if ( !handler ) {
+                cache[ type ] = [];
+            } else {
+                for ( var i = 0; i < handlers.length; i++ ) {
+                    callback = handlers[ i ];
+                    if ( callback.fun === handler ) {
+                        handlers.splice( i, 1 );
+                        --i;
+                    }
+                }
+            }
+            return this;
+        },
+        clear   : function() {
+            this.__cache = {};
             return this;
         }
     };
