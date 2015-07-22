@@ -1,5 +1,5 @@
 (function( win ) {
-    var __ = {};
+    var __ = {}, _slice = Array.prototype.slice;
     // 字符串相关处理
     __.string = {};
     (function() {
@@ -694,10 +694,18 @@
         imagePing             : function( url, onLoad, onError ) {
             var img = new Image();
             if ( onLoad && (typeof onLoad == 'function') ) {
-                img.onload = onLoad;
+                img.onload = function() {
+                    onLoad.apply( this, _slice.call( arguments ) );
+                    // 避免IE6下问题，可能会导致重复加载
+                    img.onload = null;
+                };
             }
             if ( onError && (typeof onError == 'function') ) {
-                img.onerror = onError;
+                img.onerror = function() {
+                    onError.call( this, _slice.call( arguments ) );
+                    // 避免IE6下问题，可能会导致重复加载
+                    img.onerror = null;
+                };
             }
             img.src = url;
         },
