@@ -12,7 +12,7 @@
  */
 !function( win, option ) {
     option             = option || {};
-    var settings       = { designWidth : 640, designFontSize : 20, handleResize : true },
+    var settings       = { designWidth : 720, designFontSize : 100, handleResize : true },
         MAX_COUNT      = 20,
         handleResize   = option.handleResize || settings.handleResize,
         designWidth    = option.designWidth || settings.designWidth,
