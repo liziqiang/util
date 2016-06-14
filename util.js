@@ -1,8 +1,33 @@
 (function( win ) {
-    var __    = {}, _slice = Array.prototype.slice;
+    var __         = {},
+        _slice     = Array.prototype.slice,
+        toString   = Object.prototype.toString,
+        class2type = {};
     // 字符串相关处理
-    __.string = {};
+    __.string      = {};
     (function() {
+        function likeArray( obj ) { return typeof obj.length === 'number'; };
+        __.each = function( elements, callback ) {
+            var i, key;
+            if ( likeArray( elements ) ) {
+                for ( i = 0; i < elements.length; i++ ) {
+                    if ( callback.call( elements[ i ], i, elements[ i ] ) === false ) {
+                        return elements
+                    }
+                }
+            } else {
+                for ( key in elements ) {
+                    if ( callback.call( elements[ key ], key, elements[ key ] ) === false ) {
+                        return elements
+                    }
+                }
+            }
+            return elements;
+        };
+        // Populate the class2type map
+        __.each( "Boolean Number String Function Array Date RegExp Object Error".split( " " ), function( i, name ) {
+            class2type[ "[object " + name + "]" ] = name.toLowerCase()
+        } );
         /**
          * 对字符串进行异或操作
          * @param s1
@@ -667,8 +692,38 @@
             }
         }
     };
+    function type( obj ) {
+        return obj == null ? String( obj ) : (class2type[ toString.call( obj ) ] || "object");
+    }
+
+    function isString( value ) {
+        return type( value ) == 'string';
+    }
+
+    function isFunction( value ) {
+        return type( value ) == 'function';
+    }
+
+    // bind
+    __.proxy     = function( fn, context ) {
+        var args = (2 in arguments) && _slice.call( arguments, 2 );
+        if ( isFunction( fn ) ) {
+            return function() {
+                return fn.apply( context, args ? args.concat( _slice.call( arguments ) ) : arguments );
+            }
+        } else if ( isString( context ) ) {
+            if ( args ) {
+                args.unshift( fn[ context ], fn );
+                return __.proxy.apply( null, args );
+            } else {
+                return __.proxy( fn[ context ], fn );
+            }
+        } else {
+            throw new TypeError( 'expected function' );
+        }
+    };
     // 观察者模式
-    __.observer     = {
+    __.observer  = {
         on      : function( type, handler, options ) {
             var cache = this.__cache || (this.__cache = {});
             (cache[ type ] || (cache[ type ] = [])).push( { arg : options, fun : handler } );
@@ -707,7 +762,7 @@
         }
     };
     // Ajax相关
-    __.ajax         = {
+    __.ajax      = {
         createXHR             : function() {
             if ( typeof XMLHttpRequest != 'undefined' ) {
                 return new XMLHttpRequest();
@@ -774,7 +829,7 @@
             return xhr;
         }
     };
-    __.namespace    = function( root, path, value ) {
+    __.namespace = function( root, path, value ) {
         if ( !path ) { return root; }
         var ary = path.split( '.' ), k = '';
         while ( k = ary.shift() ) {
@@ -790,7 +845,7 @@
             }
         }
     };
-    window.__       = window.__ || __;
+    window.__    = window.__ || __;
 })();
 //var obj = {};
 //Object.defineProperty( obj, 'name', { writable : false, value : "John" } );
