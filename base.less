@@ -1,0 +1,117 @@
+/**
+ * base.less
+ * 函数调用
+ */
+.size(@width, @height) {
+    width  : @width;
+    height : @height;
+}
+.square(@size) {
+    .size(@size; @size);
+}
+//透明度
+.opacity(@opacity) {
+    opacity : @opacity;
+    @opa : (@opacity*100);
+    filter  : ~"alpha(opacity=@{opa})";
+}
+//背景透明，内容不透明
+.bg-rgba(@r, @g, @b, @a) {
+    @bg : rgba(@r, @g, @b, @a);
+    @start : argb(@bg);
+    @end : argb(@bg);
+    background : @bg;
+    //ie9以下兼容
+    background : transparent \9;
+    filter     : ~"progid:DXImageTransform.Microsoft.gradient(startColorstr=@{start},endColorstr=@{end})";
+    zoom       : 1;
+}
+.img-filter-ie6(@img) {
+    _background-image : none;
+    _filter           : progid:DXImageTransform.Microsoft.AlphaImageLoader(src=@img);
+}
+.border-radius (@radius) {
+    -ms-border-radius     : @radius;
+    -o-border-radius      : @radius;
+    -moz-border-radius    : @radius;
+    -webkit-border-radius : @radius;
+    border-radius         : @radius;
+}
+//分别对4个角处理 有默认值5px
+.border-radius-custom (@topleft: 5px, @topright: 5px, @bottomleft: 5px, @bottomright: 5px) {
+    -webkit-border-radius : @topleft @topright @bottomright @bottomleft;
+    -moz-border-radius    : @topleft @topright @bottomright @bottomleft;
+    -ms-border-radius     : @topleft @topright @bottomright @bottomleft;
+    -o-border-radius      : @topleft @topright @bottomright @bottomleft;
+    border-radius         : @topleft @topright @bottomright @bottomleft;
+}
+//外阴影
+.box-shadow(@x: 0px, @y: 0px, @blur: 8px, @alpha: 0.5) {
+    -webkit-box-shadow : @x @y @blur rgba(0, 0, 0, @alpha);
+    -moz-box-shadow    : @x @y @blur rgba(0, 0, 0, @alpha);
+    -ms-box-shadow     : @x @y @blur rgba(0, 0, 0, @alpha);
+    -o-box-shadow      : @x @y @blur rgba(0, 0, 0, @alpha);
+    box-shadow         : @x @y @blur rgba(0, 0, 0, @alpha);
+}
+// 内阴影
+.inner-shadow(@param1,@param2,@param3,@opacity) {
+    -webkit-box-shadow : inset @param1 @param2 @param3 rgba(0, 0, 0, @opacity);
+    -moz-box-shadow    : inset @param1 @param2 @param3 rgba(0, 0, 0, @opacity);
+    -ms-box-shadow     : inset @param1 @param2 @param3 rgba(0, 0, 0, @opacity);
+    -o-box-shadow      : inset @param1 @param2 @param3 rgba(0, 0, 0, @opacity);
+    box-shadow         : inset @param1 @param2 @param3 rgba(0, 0, 0, @opacity);
+}
+//元素过渡效果
+.transition (@prop: all, @time: 1s, @ease: ease, @delay: 0s) {
+    -webkit-transition : @prop @time @ease @delay;
+    -moz-transition    : @prop @time @ease @delay;
+    -o-transition      : @prop @time @ease @delay;
+    -ms-transition     : @prop @time @ease @delay;
+    transition         : @prop @time @ease @delay;
+}
+//旋转
+.transform (@param) {
+    -webkit-transform : @param;
+    -moz-transform    : @param;
+    -o-transform      : @param;
+    -ms-transform     : @param;
+    transform         : @param;
+}
+//颜色渐变
+.gradient(@origin: top, @startColor, @endColor) {
+    background-color : @startColor/2 + @endColor/2;
+    filter           : ~"progid:DXImageTransform.Microsoft.gradient(startColorstr='@{startColor}', endColorstr='@{endColor}')";
+    background-image : -webkit-linear-gradient(@origin, @startColor, @endColor);
+    background-image : -moz-linear-gradient(@origin, @startColor, @endColor);
+    background-image : -o-linear-gradient(@origin, @startColor, @endColor);
+    background-image : -ms-linear-gradient(@origin, @startColor, @endColor);
+    background-image : linear-gradient(@origin, @startColor, @endColor);
+}
+// 三角形
+.triangle(@top, @right, @bottom, @left, @btColor, @brColor, @bbColor, @blColor) {
+    width               : 0;
+    height              : 0;
+    border-style        : solid;
+    border-width        : @top @right @bottom @left;
+    border-top-color    : @btColor;
+    border-right-color  : @brColor;
+    border-bottom-color : @bbColor;
+    border-left-color   : @blColor;
+}
+// 垂直居中
+.middle-v(@height) {
+    height      : @height;
+    line-height : @height;
+}
+.line-clamp(@line, @max-height) {
+    overflow           : hidden;
+    max-height         : @max-height;
+    display            : -webkit-box;
+    -webkit-line-clamp : @line;
+    -webkit-box-orient : vertical;
+}
+.text-line-cut() {
+    overflow      : hidden;
+    white-space   : nowrap;
+    text-overflow : ellipsis;
+}
