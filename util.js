@@ -26,7 +26,7 @@
         };
         // Populate the class2type map
         __.each( "Boolean Number String Function Array Date RegExp Object Error".split( " " ), function( i, name ) {
-            class2type[ "[object " + name + "]" ] = name.toLowerCase()
+            class2type[ "[object " + name + "]" ] = name.toLowerCase();
         } );
         /**
          * 对字符串进行异或操作
@@ -114,10 +114,7 @@
         return ret;
     };
     // 获得[lower, upper]范围内的整数
-    __.random         = function( lower, upper ) {
-        var range = upper - lower + 1;
-        return Math.floor( Math.random() * range + lower );
-    };
+    __.random         = function( lower, upper ) { return Math.floor( Math.random() * (upper - lower + 1) + lower ); };
     // 属性是否来自原型
     __.fromPrototype  = function( obj, name ) {
         return !obj.hasOwnProperty( name ) && (name in obj);
