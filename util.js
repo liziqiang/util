@@ -845,7 +845,24 @@
             }
         }
     };
-    window.__    = window.__ || __;
+    /**
+     * 转换字符串为变量
+     * @param str
+     */
+    __.str2Obj = function( str ) {
+        var pattern = /###([\w\.]+)###/g;
+        return str.replace( pattern, function() {
+            var match = arguments[ 1 ];
+            if ( !match ) { return ''; }
+            var key  = null,
+                ary  = match.split( '.' ),
+                root = window;
+            while ( root && (key = ary.shift()) ) { root = root[ key ]; }
+            if ( root === undefined || root === null ) { return ''; }
+            return root;
+        } );
+    };
+    window.__ = window.__ || __;
 })();
 //var obj = {};
 //Object.defineProperty( obj, 'name', { writable : false, value : "John" } );
